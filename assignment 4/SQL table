@@ -1,0 +1,44 @@
+## Code for SQL table/set up ##
+
+PRAGMA FOREIGN_KEYS = ON;
+DROP TABLE IF EXISTS user;
+CREATE TABLE user (
+    id TEXT NOT NULL,
+    first_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    rfid_cardnum TEXT PRIMARY KEY,
+    access_status TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS res;
+CREATE TABLE res (
+    id TEXT PRIMARY KEY NOT NULL,
+    res_name TEXT,
+    res_description TEXT
+);
+
+DROP TABLE IF EXISTS scanner;
+CREATE TABLE scanner (
+    id TEXT PRIMARY KEY NOT NULL, 
+    res_id TEXT NOT NULL,
+    rfid_cardnum TEXT,
+    FOREIGN KEY(res_id) REFERENCES res(id),
+    FOREIGN KEY(rfid_cardnum) REFERENCES user(rfid_cardnum)
+
+);
+
+DROP TABLE IF EXISTS log_access;
+CREATE TABLE log_access (
+    access_time DATETIME default CURRENT_TIME,
+    grant_access TEXT,
+    reason_code TEXT,
+    res_id TEXT NOT NULL,
+    rfid_cardnum TEXT,
+    user_id TEXT NOT NULL,
+    PRIMARY KEY (res_id, rfid_cardnum, user_id),
+    FOREIGN KEY (res_id) references res(id), 
+    FOREIGN KEY (rfid_cardnum) references user(rfid_cardnum),
+    FOREIGN KEY (user_id) references user(id)
+ 
+);
+
