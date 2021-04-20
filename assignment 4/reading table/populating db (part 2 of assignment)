@@ -1,0 +1,122 @@
+import sqlite3
+import numpy as np
+import names
+import pandas as pd
+import random
+from random import choice
+
+random.seed(1001)
+np.random.seed(1001)
+
+# careful, using direct paths here (bad practice, I know)
+
+def dbConnection():
+    return sqlite3.connect(r"C:\Users\jrk88473\Desktop\Grad Class Fall 2020\INFO coding\Assignment 4\n_assignment4.db")
+
+with dbConnection() as con, open(r"C:\Users\jrk88473\Desktop\Grad Class Fall 2020\INFO coding\Assignment 4\assignment4p1.sql") as script:
+    con.executescript(script.read())
+
+with dbConnection() as con:
+    first_names = pd.Series([names.get_first_name() for _ in range(0,4)])
+    last_names = pd.Series([names.get_last_name() for _ in range(0,4)])
+    
+    # populating users
+    # assigning random names to a total of 4 users (later 5)
+
+    # for each first name, sample a set of last names
+    # this part taken from class
+
+    names = []
+    for fn in first_names:
+        names.extend([{"first_name":fn,"last_name":ln} for ln in last_names.sample()])
+    
+    users = pd.DataFrame(names)
+    users['id'] = [str(x) for x in random.sample(range(111111,999999),len(users))]
+
+    users['rfid_cardnum'] = [str(x) for x in random.sample(range(100000000000,999999999999),len(users))]
+
+    users['access_status'] = choice(['yes', 'no'])
+    print(users)
+
+     # insert all of these in the people table
+    con.executemany("INSERT INTO user(first_name,last_name,id,rfid_cardnum,access_status) VALUES (?,?,?,?,?)",users.to_records(index=False).tolist())
+
+       # populating resources
+    # don't believe this needs to be random
+    resources = [
+    ("0001C","Cafeteria","access to cafeteria"),
+    ("0002R","Roof","access to roof-top area"),
+    ("0003S","Server","access to server location"),
+    ("0004O","District Office","access to downtown office location")]
+
+    for res in resources:
+        con.execute("INSERT INTO res(id,res_name,res_description) VALUES (?,?,?)",res)
+    
+    #Setting up scanners    
+
+import sqlite3
+import numpy as np
+import names
+import pandas as pd
+import random
+from random import choice
+
+random.seed(1001)
+np.random.seed(1001)
+
+def dbConnection():
+    return sqlite3.connect(r"C:\Users\jrk88473\Desktop\Grad Class Fall 2020\INFO coding\Assignment 4\n_assignment4.db")
+
+with dbConnection() as con, open(r"C:\Users\jrk88473\Desktop\Grad Class Fall 2020\INFO coding\Assignment 4\assignment4p1.sql") as script:
+    con.executescript(script.read())
+
+with dbConnection() as con:
+    first_names = pd.Series([names.get_first_name() for _ in range(0,4)])
+    last_names = pd.Series([names.get_last_name() for _ in range(0,4)])
+    
+    # populating users
+    # assigning random names to a total of 4 users (later 5)
+
+    # for each first name, sample a set of last names
+    # this part taken from class
+
+    names = []
+    for fn in first_names:
+        names.extend([{"first_name":fn,"last_name":ln} for ln in last_names.sample()])
+    
+    users = pd.DataFrame(names)
+    users['id'] = [str(x) for x in random.sample(range(111111,999999),len(users))]
+
+    users['rfid_cardnum'] = [str(x) for x in random.sample(range(100000000000,999999999999),len(users))]
+
+    users['access_status'] = choice(['yes', 'no'])
+    print(users)
+
+     # insert all of these in the people table
+    con.executemany("INSERT INTO user(first_name,last_name,id,rfid_cardnum,access_status) VALUES (?,?,?,?,?)",users.to_records(index=False).tolist())
+
+    # populating resources
+    # don't believe this needs to be random
+    resources = [
+    ("0001C","Cafeteria","access to cafeteria"),
+    ("0002R","Roof","access to roof-top area"),
+    ("0003S","Server","access to server location"),
+    ("0004O","District Office","access to downtown office location")]
+
+    for res in resources:
+        con.execute("INSERT INTO res(id,res_name,res_description) VALUES (?,?,?)",res)
+
+    #Setting up scanners    
+
+# okay, here is where im having trouble lol
+# want the column in SCANENRS sql table to be the same values as were previously randomly generated earlier in script for users
+# SCANNERS table is referencing user rfid card num (FOREIGN KEY check)
+# can't get logic to work though, think I'm fucking up the syntax here
+
+
+    scanners['id'] = [("SCAN1","SCAN2","SCAN3","SCAN4")]
+    scanners['res_id'] = [("0001C","0002R","0003S","0004O")]
+    scanners['rfid_cardnum'] = [str(x) for x in pd.read_sql("SELECT rfid_cardnum from user",con=con)]
+
+    con.executemany("INSERT INTO scanner(id,res_id,rfid_cardnum) VALUES (?,?,?)",scanners)
+
